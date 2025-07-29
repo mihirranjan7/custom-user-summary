@@ -1,10 +1,35 @@
-{{#each-in @outletArgs.user.public_user_fields as |fieldId fieldValue|}}
-  {{#if (eq (lowercase @outletArgs.user.user_fields.[fieldId]) "profile note")}}
-    <div class="profile-note-summary-stat">
-      <span class="user-field-name">Profile Note:</span>
-      <span class="user-field-value">
-        {{fieldValue}}
-      </span>
+{{!-- Display and edit a custom user field (e.g., "profile note") for user_field_5 --}}
+{{#if this.fieldValue}}
+  <div class="profile-note-display">
+    <strong>Profile Note:</strong> {{this.fieldValue}}
+  </div>
+{{else}}
+  {{#if this.canEdit}}
+    <div class="profile-note-display empty">
+      <em>No profile note set</em>
     </div>
   {{/if}}
-{{/each-in}}
+{{/if}}
+
+{{#if this.canEdit}}
+  {{#unless this.editing}}
+    <button class="btn btn-primary btn-small" {{on "click" this.startEdit}}>
+      {{#if this.fieldValue}}Edit{{else}}Add{{/if}} Profile Note
+    </button>
+  {{/unless}}
+{{/if}}
+
+{{#if this.editing}}
+  <form {{on "submit" this.save}}>
+    <textarea
+      rows="4"
+      style="width:100%;"
+      value={{this.editValue}}
+      {{on "input" this.updateEdit}}
+      autofocus
+    ></textarea>
+    <br>
+    <button type="submit" class="btn btn-primary btn-small">Save</button>
+    <button type="button" class="btn btn-conditional btn-small" {{on "click" this.cancelEdit}}>Cancel</button>
+  </form>
+{{/if}}
