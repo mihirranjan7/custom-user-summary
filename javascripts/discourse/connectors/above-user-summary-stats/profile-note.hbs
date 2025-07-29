@@ -1,10 +1,10 @@
-{{! This connector displays the Profile Note custom user field above the user summary stats }}
-
-{{#if @outletArgs.user.public_user_fields.5}}
-  <div class="profile-note-summary-stat">
-    <span class="user-field-name">Profile Note:</span>
-    <span class="user-field-value">
-      {{@outletArgs.user.custom_fields.5}}
-    </span>
-  </div>
-{{/if}}
+{{#each-in @outletArgs.user.public_user_fields as |fieldId fieldValue|}}
+  {{#if (eq (lowercase @outletArgs.user.user_fields.[fieldId]) "profile note")}}
+    <div class="profile-note-summary-stat">
+      <span class="user-field-name">Profile Note:</span>
+      <span class="user-field-value">
+        {{fieldValue}}
+      </span>
+    </div>
+  {{/if}}
+{{/each-in}}
