@@ -1,45 +1,60 @@
-import { apiInitializer } from "discourse/lib/api";
-import { ajax } from "discourse/lib/ajax";
+import Component from "@glimmer/component";
+import { action } from "@ember/object";
 import { tracked } from "@glimmer/tracking";
+import { inject as service } from "@ember/service";
+import { ajax } from "discourse/lib/ajax";
+import { userPath } from "discourse/lib/url";
 
-export default apiInitializer("0.11.1", api => {
-  api.modifyClass("component:connector-above-user-summary-stats-profile-note", {
-    editMode: false,
-    @tracked newValue: "",
-    @tracked currentValue: null,
+export default class ProfileNote extends Component {
+  @service currentUser;
 
-    didReceiveAttrs() {
-      // Get the value for your custom field
-      this.currentValue =
-        this.model.custom_fields && this.model.custom_fields.user_field_5; // Use your field id!
-      if (!this.editMode) {
-        this.newValue = this.currentValue || "";
+  @tracked editing = false;
+  @tracked editValue = "";
+
+  get user() {
+    // outletArgs.model is the user instance
+    return this.args.outletArgs.model;
+  }
+
+  get canEdit() {
+    // Only allow editing your own profile
+    return this.currentUser && this.user && this.currentUser.id === this.user.id;
+  }
+
+  get fieldValue() {
+    // user_fields is the camelCase mapping, custom fields are as user_field_5
+    return this.user?.user_fields?.["5"];
+  }
+
+  @action
+  startEdit() {
+    this.editing = true;
+    this.editValue = this.fieldValue || "";
+  }
+
+  @action
+  updateEdit(event) {
+    this.editValue = event.target.value;
+  }
+
+  @action
+  async save(event) {
+    event.preventDefault();
+    // PATCH /u/{username}.json with updated custom field
+    await ajax(userPath(`${this.user.username}.json`), {
+      type: "PUT",
+      data: {
+        user_fields: { "5": this.editValue }
       }
-    },
+    });
+    // Reload model for updated field
+    this.user.user_fields["5"] = this.editValue;
+    this.editing = false;
+  }
 
-    edit() {
-      this.editMode = true;
-      this.newValue = this.currentValue || "";
-    },
-
-    handleInput(e) {
-      this.newValue = e.target.value;
-    },
-
-    save() {
-      ajax(`/u/${this.model.username_lower}/preferences`, {
-        type: "PUT",
-        data: { user_fields: { "5": this.newValue } }, // Update "5" if your field id differs
-      }).then(() => {
-        this.currentValue = this.newValue;
-        this.model.set("custom_fields.user_field_5", this.newValue);
-        this.editMode = false;
-      });
-    },
-
-    cancel() {
-      this.editMode = false;
-      this.newValue = this.currentValue || "";
-    }
-  });
-});
+  @action
+  cancelEdit() {
+    this.editing = false;
+    this.editValue = "";
+  }
+}
