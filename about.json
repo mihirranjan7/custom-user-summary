@@ -1,6 +1,10 @@
 {
-  "name": "Profile Note Theme Component",
+  "name": "Profile Note Field",
+  "description": "Lets users edit and display a custom profile note field next to their summary page stats.",
+  "component": true,
   "about_url": "https://meta.discourse.org/t/creating-and-configuring-custom-user-fields/113192",
   "license": "MIT",
-  "theme_version": "0.1"
+  "theme_version": "0.2",
+  "authors": ["Mihir"],
+  "minimum_discourse_version": "2.8.0"
 }
