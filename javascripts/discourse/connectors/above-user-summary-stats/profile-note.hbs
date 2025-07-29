@@ -1,26 +1,35 @@
-{{!-- Show editor if viewing your own profile --}}
-{{#if (and currentUser (eq currentUser.id model.id))}}
-  {{#if this.editMode}}
-    <textarea
-      value={{this.newValue}}
-      {{on "input" this.handleInput}}
-      rows="3"
-      style="width:100%;margin-bottom:4px;"
-    ></textarea>
-    <button type="button" {{on "click" this.save}}>Save</button>
-    <button type="button" {{on "click" this.cancel}}>Cancel</button>
-  {{else}}
-    <div style="margin-bottom:4px;">
-      {{#if this.currentValue}}
-        {{this.currentValue}}
-      {{else}}
-        <em>No profile note yet.</em>
-      {{/if}}
-    </div>
-    <button type="button" {{on "click" this.edit}}>Edit Note</button>
-  {{/if}}
+{{!-- Display and edit a custom user field (e.g., "profile note") for user_field_5 --}}
+{{#if this.fieldValue}}
+  <div class="profile-note-display">
+    <strong>Profile Note:</strong> {{this.fieldValue}}
+  </div>
 {{else}}
-  {{#if this.currentValue}}
-    <div style="margin-bottom:4px;">{{this.currentValue}}</div>
+  {{#if this.canEdit}}
+    <div class="profile-note-display empty">
+      <em>No profile note set</em>
+    </div>
   {{/if}}
+{{/if}}
+
+{{#if this.canEdit}}
+  {{#unless this.editing}}
+    <button class="btn btn-primary btn-small" {{on "click" this.startEdit}}>
+      {{#if this.fieldValue}}Edit{{else}}Add{{/if}} Profile Note
+    </button>
+  {{/unless}}
+{{/if}}
+
+{{#if this.editing}}
+  <form {{on "submit" this.save}}>
+    <textarea
+      rows="4"
+      style="width:100%;"
+      value={{this.editValue}}
+      {{on "input" this.updateEdit}}
+      autofocus
+    ></textarea>
+    <br>
+    <button type="submit" class="btn btn-primary btn-small">Save</button>
+    <button type="button" class="btn btn-conditional btn-small" {{on "click" this.cancelEdit}}>Cancel</button>
+  </form>
 {{/if}}
