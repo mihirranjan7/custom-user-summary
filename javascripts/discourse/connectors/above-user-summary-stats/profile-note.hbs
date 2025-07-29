@@ -1,0 +1,26 @@
+{{!-- Show editor if viewing your own profile --}}
+{{#if (and currentUser (eq currentUser.id model.id))}}
+  {{#if this.editMode}}
+    <textarea
+      value={{this.newValue}}
+      {{on "input" this.handleInput}}
+      rows="3"
+      style="width:100%;margin-bottom:4px;"
+    ></textarea>
+    <button type="button" {{on "click" this.save}}>Save</button>
+    <button type="button" {{on "click" this.cancel}}>Cancel</button>
+  {{else}}
+    <div style="margin-bottom:4px;">
+      {{#if this.currentValue}}
+        {{this.currentValue}}
+      {{else}}
+        <em>No profile note yet.</em>
+      {{/if}}
+    </div>
+    <button type="button" {{on "click" this.edit}}>Edit Note</button>
+  {{/if}}
+{{else}}
+  {{#if this.currentValue}}
+    <div style="margin-bottom:4px;">{{this.currentValue}}</div>
+  {{/if}}
+{{/if}}
